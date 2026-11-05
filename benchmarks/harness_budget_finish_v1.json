@@ -1,0 +1,475 @@
+{
+  "schema_version": 2,
+  "evaluation_protocol": "budget_finish_v1",
+  "acceptance_revision": "budget-cases-v1",
+  "purpose": "Authored development regression, not blind evaluation. All eight fixed public-failing candidates are included. Both arms receive common initial public feedback; shared reserves zero calls, reserved reserves two within the same total. No post-acceptance model repair.",
+  "independent_rubric_sha256": "04eb30bfe37d542cafc88c97c79ffe401e40ecd96565415e4635cdee31dbf55e",
+  "tasks": [
+    {
+      "id": "normalize-config-string-bool",
+      "family": "configuration",
+      "prompt": "Update config.json to contain exactly {\"enabled\":true,\"retries\":3}. Keep valid JSON types.",
+      "files": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":\"true\",\"retries\":3}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":true,\"retries\":3}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "config",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ],
+      "rubric": [
+        {
+          "id": "configuration",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ],
+      "candidate_id": "string-bool"
+    },
+    {
+      "id": "normalize-config-wrong-retries",
+      "family": "configuration",
+      "prompt": "Update config.json to contain exactly {\"enabled\":true,\"retries\":3}. Keep valid JSON types.",
+      "files": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":true,\"retries\":0}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":true,\"retries\":3}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "config",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ],
+      "rubric": [
+        {
+          "id": "configuration",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ],
+      "candidate_id": "wrong-retries"
+    },
+    {
+      "id": "aggregate-orders-includes-cancelled",
+      "family": "data_processing",
+      "prompt": "Read orders.csv and create totals.json mapping each customer to the sum of amounts, excluding cancelled rows. Preserve orders.csv.",
+      "files": [
+        {
+          "path": "orders.csv",
+          "content": "customer,amount,status\nalice,12,paid\nbob,7,paid\nalice,3,paid\nbob,9,cancelled\n"
+        },
+        {
+          "path": "totals.json",
+          "content": "{\"alice\":15,\"bob\":16}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "totals.json",
+          "content": "{\"alice\":15,\"bob\":7}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "totals",
+          "kind": "json_equals",
+          "path": "totals.json",
+          "expected": {
+            "alice": 15,
+            "bob": 7
+          }
+        }
+      ],
+      "rubric": [
+        {
+          "id": "order_totals",
+          "kind": "json_equals",
+          "path": "totals.json",
+          "expected": {
+            "alice": 15,
+            "bob": 7
+          }
+        },
+        {
+          "id": "input",
+          "kind": "file_equals",
+          "path": "orders.csv",
+          "expected": "customer,amount,status\nalice,12,paid\nbob,7,paid\nalice,3,paid\nbob,9,cancelled\n"
+        }
+      ],
+      "candidate_id": "includes-cancelled"
+    },
+    {
+      "id": "aggregate-orders-drops-order",
+      "family": "data_processing",
+      "prompt": "Read orders.csv and create totals.json mapping each customer to the sum of amounts, excluding cancelled rows. Preserve orders.csv.",
+      "files": [
+        {
+          "path": "orders.csv",
+          "content": "customer,amount,status\nalice,12,paid\nbob,7,paid\nalice,3,paid\nbob,9,cancelled\n"
+        },
+        {
+          "path": "totals.json",
+          "content": "{\"alice\":12,\"bob\":7}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "totals.json",
+          "content": "{\"alice\":15,\"bob\":7}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "totals",
+          "kind": "json_equals",
+          "path": "totals.json",
+          "expected": {
+            "alice": 15,
+            "bob": 7
+          }
+        }
+      ],
+      "rubric": [
+        {
+          "id": "order_totals",
+          "kind": "json_equals",
+          "path": "totals.json",
+          "expected": {
+            "alice": 15,
+            "bob": 7
+          }
+        },
+        {
+          "id": "input",
+          "kind": "file_equals",
+          "path": "orders.csv",
+          "expected": "customer,amount,status\nalice,12,paid\nbob,7,paid\nalice,3,paid\nbob,9,cancelled\n"
+        }
+      ],
+      "candidate_id": "drops-order"
+    },
+    {
+      "id": "repair-stable-unique-sorted",
+      "family": "code_repair",
+      "prompt": "Repair solution.stable_unique(values): return a new list of unique integers while preserving their first occurrence order. Do not change the input list. Read and run tests_public.py; preserve that test file.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    return sorted(set(values))\n"
+        },
+        {
+          "path": "tests_public.py",
+          "content": "from solution import stable_unique\nvalues = [3, 1, 3, 2]\nassert stable_unique(values) == [3, 1, 2]\nassert values == [3, 1, 3, 2], 'input mutated'\nprint('public checks passed')\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    return list(dict.fromkeys(values))\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public_tests",
+          "kind": "command",
+          "cmd": "\"{python}\" tests_public.py",
+          "timeout_seconds": 15
+        }
+      ],
+      "rubric": [
+        {
+          "id": "behavior",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "stable_unique",
+          "cases": [
+            {
+              "args": [
+                [
+                  3,
+                  1,
+                  3,
+                  2
+                ]
+              ],
+              "expected": [
+                3,
+                1,
+                2
+              ]
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": []
+            },
+            {
+              "args": [
+                [
+                  0,
+                  -1,
+                  0,
+                  5,
+                  -1
+                ]
+              ],
+              "expected": [
+                0,
+                -1,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "id": "public_preserved",
+          "kind": "file_equals",
+          "path": "tests_public.py",
+          "expected": "from solution import stable_unique\nvalues = [3, 1, 3, 2]\nassert stable_unique(values) == [3, 1, 2]\nassert values == [3, 1, 3, 2], 'input mutated'\nprint('public checks passed')\n"
+        }
+      ],
+      "candidate_id": "sorted"
+    },
+    {
+      "id": "repair-stable-unique-mutates-input",
+      "family": "code_repair",
+      "prompt": "Repair solution.stable_unique(values): return a new list of unique integers while preserving their first occurrence order. Do not change the input list. Read and run tests_public.py; preserve that test file.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    values[:] = list(dict.fromkeys(values))\n    return values\n"
+        },
+        {
+          "path": "tests_public.py",
+          "content": "from solution import stable_unique\nvalues = [3, 1, 3, 2]\nassert stable_unique(values) == [3, 1, 2]\nassert values == [3, 1, 3, 2], 'input mutated'\nprint('public checks passed')\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    return list(dict.fromkeys(values))\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public_tests",
+          "kind": "command",
+          "cmd": "\"{python}\" tests_public.py",
+          "timeout_seconds": 15
+        }
+      ],
+      "rubric": [
+        {
+          "id": "behavior",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "stable_unique",
+          "cases": [
+            {
+              "args": [
+                [
+                  3,
+                  1,
+                  3,
+                  2
+                ]
+              ],
+              "expected": [
+                3,
+                1,
+                2
+              ]
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": []
+            },
+            {
+              "args": [
+                [
+                  0,
+                  -1,
+                  0,
+                  5,
+                  -1
+                ]
+              ],
+              "expected": [
+                0,
+                -1,
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "id": "public_preserved",
+          "kind": "file_equals",
+          "path": "tests_public.py",
+          "expected": "from solution import stable_unique\nvalues = [3, 1, 3, 2]\nassert stable_unique(values) == [3, 1, 2]\nassert values == [3, 1, 3, 2], 'input mutated'\nprint('public checks passed')\n"
+        }
+      ],
+      "candidate_id": "mutates-input"
+    },
+    {
+      "id": "release-version-package-version",
+      "family": "multi_file",
+      "prompt": "Set version 1.2.0 in package.json and VERSION. Preserve the name field praxis-demo and remove no other fields.",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"praxis-demo\",\"version\":\"1.1.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.2.0\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"praxis-demo\",\"version\":\"1.2.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.2.0\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "package",
+          "kind": "json_equals",
+          "path": "package.json",
+          "expected": {
+            "name": "praxis-demo",
+            "version": "1.2.0"
+          }
+        },
+        {
+          "id": "version",
+          "kind": "file_contains",
+          "path": "VERSION",
+          "text": "1.2.0"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "package_fields",
+          "kind": "json_equals",
+          "path": "package.json",
+          "expected": {
+            "name": "praxis-demo",
+            "version": "1.2.0"
+          }
+        },
+        {
+          "id": "version_file",
+          "kind": "file_equals",
+          "path": "VERSION",
+          "expected": "1.2.0\n"
+        }
+      ],
+      "candidate_id": "package-version"
+    },
+    {
+      "id": "release-version-package-name",
+      "family": "multi_file",
+      "prompt": "Set version 1.2.0 in package.json and VERSION. Preserve the name field praxis-demo and remove no other fields.",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"wrong\",\"version\":\"1.2.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.2.0\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"praxis-demo\",\"version\":\"1.2.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.2.0\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "package",
+          "kind": "json_equals",
+          "path": "package.json",
+          "expected": {
+            "name": "praxis-demo",
+            "version": "1.2.0"
+          }
+        },
+        {
+          "id": "version",
+          "kind": "file_contains",
+          "path": "VERSION",
+          "text": "1.2.0"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "package_fields",
+          "kind": "json_equals",
+          "path": "package.json",
+          "expected": {
+            "name": "praxis-demo",
+            "version": "1.2.0"
+          }
+        },
+        {
+          "id": "version_file",
+          "kind": "file_equals",
+          "path": "VERSION",
+          "expected": "1.2.0\n"
+        }
+      ],
+      "candidate_id": "package-name"
+    }
+  ]
+}

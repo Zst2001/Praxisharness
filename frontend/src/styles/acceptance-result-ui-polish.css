@@ -1,0 +1,45 @@
+.acceptance-result-card.ant-card { margin: 24px 0; max-width: 100%; border-color: var(--border); border-radius: 16px; font-size: 16px; box-shadow: 0 4px 16px var(--shadow-soft); }
+.acceptance-result-card .ant-card-head { padding: 0 24px; min-height: 64px; }
+.acceptance-result-card .ant-card-head-title { font-size: 18px; font-weight: 600; }
+.acceptance-result-card .ant-card-body { padding: 24px; }
+.acceptance-result-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.acceptance-result-summary > .ant-tag { margin: 0; padding: 4px 10px; font-size: 14px; line-height: 1.5; border-radius: 7px; }
+.acceptance-result-summary > strong { font-size: 18px; color: var(--text); font-variant-numeric: tabular-nums; }
+.acceptance-result-summary > span:last-child { margin-left: auto; font-size: 14px; color: var(--muted); }
+.acceptance-result-meter { height: 6px; margin-top: 16px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.acceptance-result-meter > span { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.acceptance-result-meter.is-complete > span { background: var(--success); }
+.acceptance-result-usage { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 20px 0; padding: 16px; background: var(--surface-subtle); border-radius: 12px; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.acceptance-result-report, .acceptance-result-history { border-top: 1px solid var(--border); }
+.acceptance-result-report > summary, .acceptance-result-history > summary { padding: 18px 0; color: var(--text); cursor: pointer; font-size: 16px; line-height: 1.6; font-weight: 500; }
+.acceptance-result-report > summary:focus-visible, .acceptance-result-history > summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.acceptance-result-history > .acceptance-result-report { margin-left: 16px; }
+.acceptance-result-history > .acceptance-result-report > summary { font-size: 14px; color: var(--muted); }
+.acceptance-result-checks { display: grid; gap: 16px; margin: 0; padding: 0 0 20px; list-style: none; }
+.acceptance-result-check { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-subtle); min-width: 0; }
+.acceptance-result-check-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.acceptance-result-check-heading > strong { font-size: 16px; font-weight: 500; line-height: 1.6; }
+.acceptance-result-check-heading > .ant-tag { margin: 0; flex-shrink: 0; padding: 2px 8px; font-size: 13px; line-height: 1.6; }
+.acceptance-result-target { display: block; margin-top: 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.acceptance-result-detail { margin: 12px 0; font-size: 16px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; color: var(--text); }
+.acceptance-result-check-meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.acceptance-repair-link.ant-btn { margin-inline-start: 8px; }
+.acceptance-repair-history { margin-block: 16px; padding: 16px; border: 1px solid var(--border); border-inline-start: 3px solid var(--accent); border-radius: 12px; background: var(--surface-subtle); overflow-wrap: anywhere; }
+.acceptance-repair-history h3 { margin: 0 0 4px; font-size: 17px; }
+.acceptance-repair-history article { margin-top: 12px; border-top: 1px solid var(--border); }
+.acceptance-repair-history h4 { margin: 12px 0 4px; font-size: 15px; }
+.acceptance-repair-history p, .acceptance-repair-history ol { margin: 0; line-height: 1.7; color: var(--muted); }
+.acceptance-repair-history ol { padding-inline-start: 24px; }
+.acceptance-repair-history p { white-space: pre-wrap; }
+.acceptance-result-empty { margin: 20px 0; font-size: 16px; color: var(--muted); line-height: 1.8; }
+.acceptance-result-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.acceptance-result-actions .ant-btn { min-height: 42px; padding-inline: 14px; font-size: 15px; }
+@media (max-width: 540px) {
+  .acceptance-result-card .ant-card-head { padding: 0 16px; min-height: 60px; }
+  .acceptance-result-card .ant-card-body { padding: 16px; }
+  .acceptance-result-summary > span:last-child { margin-left: 0; flex-basis: 100%; }
+  .acceptance-result-usage { gap: 12px 16px; }
+  .acceptance-result-check { padding: 16px; }
+  .acceptance-result-check-heading { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .acceptance-result-actions .ant-btn { flex: 1 1 auto; }
+}

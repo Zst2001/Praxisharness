@@ -1,0 +1,365 @@
+{
+  "schema_version": 2,
+  "acceptance_revision": "v3-frozen",
+  "frozen_at": "2026-11-04",
+  "independent_rubric_sha256": "71d86384245ff8f93f3a5d946bc4993a470fe94bcb97479fb0ef3327e34fd9fe",
+  "independent_case_policy": "Authored development regression cases frozen before trials; not a blind benchmark.",
+  "evaluation_protocol": "submitted_candidate_repair_v1",
+  "purpose": "Conditional repair of two predefined failed candidates after a common synthetic first submission; not end-to-end generation.",
+  "tasks": [
+    {
+      "id": "allocate-cents",
+      "family": "code_repair",
+      "prompt": "Implement allocate_cents(total, weights) using integer arithmetic and the largest-remainder method. total and weights are nonnegative integers. For a nonempty list the weight sum is positive. Break remainder ties by original index. Return [] for empty weights. Preserve inputs; allocations must sum to total. Modify only solution.py; preserve public_checks.py. Run the public tests before finishing.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def allocate_cents(total, weights):\n    if not weights:\n        return []\n    parts = [divmod(total * weight, sum(weights)) for weight in weights]\n    result = [part[0] for part in parts]\n    order = sorted(range(len(weights)), key=lambda i: (-parts[i][1], -i))\n    for index in order[:total - sum(result)]:\n        result[index] += 1\n    return result\n"
+        },
+        {
+          "path": "public_checks.py",
+          "content": "import copy\nimport json\nfrom solution import allocate_cents\n\nCASES = json.loads(r'''[{\"id\":\"public-ties\",\"args\":[3,[2,2,2,2]],\"expected\":[1,1,1,0]},{\"id\":\"public-zero\",\"args\":[0,[3,0,2]],\"expected\":[0,0,0]},{\"id\":\"public-large\",\"args\":[1000000000000007,[1,1]],\"expected\":[500000000000004,500000000000003]},{\"id\":\"public-empty\",\"args\":[4,[]],\"expected\":[]},{\"id\":\"public-weighted\",\"args\":[11,[0,3,1]],\"expected\":[0,8,3]}]''')\ndef canonical(value):\n    return json.dumps(value, sort_keys=True, allow_nan=False)\nfor case in CASES:\n    arguments = copy.deepcopy(case['args'])\n    before = canonical(arguments)\n    actual = allocate_cents(*arguments)\n    assert canonical(actual) == canonical(case['expected']), f\"{case['id']}: expected={case['expected']!r} actual={actual!r}\"\n    assert canonical(arguments) == before, f\"{case['id']}: inputs mutated\"\nprint('public checks passed')\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "def allocate_cents(total, weights):\n    if not weights:\n        return []\n    denominator = sum(weights)\n    parts = [divmod(total * weight, denominator) for weight in weights]\n    result = [part[0] for part in parts]\n    order = sorted(range(len(weights)), key=lambda i: (-parts[i][1], i))\n    for index in order[:total - sum(result)]:\n        result[index] += 1\n    return result\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public",
+          "kind": "command",
+          "cmd": "\"{python}\" public_checks.py",
+          "timeout_seconds": 20
+        }
+      ],
+      "rubric": [
+        {
+          "id": "hidden",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "allocate_cents",
+          "cases": [
+            {
+              "id": "single-weight",
+              "args": [
+                27,
+                [
+                  7
+                ]
+              ],
+              "expected": [
+                27
+              ]
+            },
+            {
+              "id": "lower-index-ties",
+              "args": [
+                5,
+                [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              ],
+              "expected": [
+                2,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "id": "zero-weights",
+              "args": [
+                7,
+                [
+                  0,
+                  0,
+                  6
+                ]
+              ],
+              "expected": [
+                0,
+                0,
+                7
+              ]
+            },
+            {
+              "id": "unequal-remainders",
+              "args": [
+                23,
+                [
+                  5,
+                  2,
+                  1
+                ]
+              ],
+              "expected": [
+                14,
+                6,
+                3
+              ]
+            },
+            {
+              "id": "large-exact-integers",
+              "args": [
+                9007199254740991,
+                [
+                  3,
+                  1
+                ]
+              ],
+              "expected": [
+                6755399441055743,
+                2251799813685248
+              ]
+            },
+            {
+              "id": "empty-weights",
+              "args": [
+                11,
+                []
+              ],
+              "expected": []
+            },
+            {
+              "id": "zero-total",
+              "args": [
+                0,
+                [
+                  9,
+                  1
+                ]
+              ],
+              "expected": [
+                0,
+                0
+              ]
+            }
+          ]
+        }
+      ],
+      "candidate_id": "largest-remainder-reversed-tie"
+    },
+    {
+      "id": "topo-order",
+      "family": "code_repair",
+      "prompt": "Implement topo_order(nodes, edges). Each edge [before, after] requires before to appear first. Edges refer to listed unique node names. Repeated edges count once. Include isolated nodes. At every step choose the lexicographically smallest available node. Return [] if any cycle exists. Preserve inputs. Modify only solution.py; preserve public_checks.py. Run the public tests before finishing.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def topo_order(nodes, edges):\n    outgoing = {node: set() for node in nodes}\n    degrees = {node: 0 for node in nodes}\n    for before, after in edges:\n        if after not in outgoing[before]:\n            outgoing[before].add(after)\n            degrees[after] += 1\n    ready = sorted(node for node in nodes if degrees[node] == 0)\n    result = []\n    while ready:\n        node = ready.pop(0)\n        result.append(node)\n        for after in sorted(outgoing[node]):\n            degrees[after] -= 1\n            if degrees[after] == 0:\n                ready.append(after)\n    return result if len(result) == len(nodes) else []\n"
+        },
+        {
+          "path": "public_checks.py",
+          "content": "import copy\nimport json\nfrom solution import topo_order\n\nCASES = json.loads(r'''[{\"id\":\"public-new-ready\",\"args\":[[\"x\",\"v\",\"m\"],[[\"v\",\"m\"]]],\"expected\":[\"v\",\"m\",\"x\"]},{\"id\":\"public-duplicates\",\"args\":[[\"server\",\"cache\",\"db\"],[[\"db\",\"server\"],[\"db\",\"server\"],[\"cache\",\"server\"]]],\"expected\":[\"cache\",\"db\",\"server\"]},{\"id\":\"public-partial-cycle\",\"args\":[[\"a\",\"b\",\"q\"],[[\"a\",\"b\"],[\"b\",\"a\"]]],\"expected\":[]},{\"id\":\"public-self-cycle\",\"args\":[[\"self\"],[[\"self\",\"self\"]]],\"expected\":[]},{\"id\":\"public-empty\",\"args\":[[],[]],\"expected\":[]},{\"id\":\"public-isolated\",\"args\":[[\"k\",\"a\",\"g\"],[]],\"expected\":[\"a\",\"g\",\"k\"]}]''')\ndef canonical(value):\n    return json.dumps(value, sort_keys=True, allow_nan=False)\nfor case in CASES:\n    arguments = copy.deepcopy(case['args'])\n    before = canonical(arguments)\n    actual = topo_order(*arguments)\n    assert canonical(actual) == canonical(case['expected']), f\"{case['id']}: expected={case['expected']!r} actual={actual!r}\"\n    assert canonical(arguments) == before, f\"{case['id']}: inputs mutated\"\nprint('public checks passed')\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "from heapq import heapify, heappop, heappush\n\ndef topo_order(nodes, edges):\n    outgoing = {node: set() for node in nodes}\n    degrees = {node: 0 for node in nodes}\n    for before, after in edges:\n        if after not in outgoing[before]:\n            outgoing[before].add(after)\n            degrees[after] += 1\n    ready = [node for node in nodes if degrees[node] == 0]\n    heapify(ready)\n    result = []\n    while ready:\n        node = heappop(ready)\n        result.append(node)\n        for after in sorted(outgoing[node]):\n            degrees[after] -= 1\n            if degrees[after] == 0:\n                heappush(ready, after)\n    return result if len(result) == len(nodes) else []\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public",
+          "kind": "command",
+          "cmd": "\"{python}\" public_checks.py",
+          "timeout_seconds": 20
+        }
+      ],
+      "rubric": [
+        {
+          "id": "hidden",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "topo_order",
+          "cases": [
+            {
+              "id": "newly-ready-order",
+              "args": [
+                [
+                  "c",
+                  "b",
+                  "a",
+                  "z"
+                ],
+                [
+                  [
+                    "a",
+                    "b"
+                  ],
+                  [
+                    "b",
+                    "c"
+                  ]
+                ]
+              ],
+              "expected": [
+                "a",
+                "b",
+                "c",
+                "z"
+              ]
+            },
+            {
+              "id": "duplicate-chain",
+              "args": [
+                [
+                  "red",
+                  "blue",
+                  "green"
+                ],
+                [
+                  [
+                    "green",
+                    "red"
+                  ],
+                  [
+                    "green",
+                    "red"
+                  ],
+                  [
+                    "red",
+                    "blue"
+                  ],
+                  [
+                    "red",
+                    "blue"
+                  ]
+                ]
+              ],
+              "expected": [
+                "green",
+                "red",
+                "blue"
+              ]
+            },
+            {
+              "id": "disconnected-cycle",
+              "args": [
+                [
+                  "free",
+                  "u",
+                  "v"
+                ],
+                [
+                  [
+                    "u",
+                    "v"
+                  ],
+                  [
+                    "v",
+                    "u"
+                  ]
+                ]
+              ],
+              "expected": []
+            },
+            {
+              "id": "isolated-and-dependencies",
+              "args": [
+                [
+                  "d",
+                  "a",
+                  "e",
+                  "b"
+                ],
+                [
+                  [
+                    "a",
+                    "e"
+                  ],
+                  [
+                    "b",
+                    "d"
+                  ]
+                ]
+              ],
+              "expected": [
+                "a",
+                "b",
+                "d",
+                "e"
+              ]
+            },
+            {
+              "id": "empty-graph",
+              "args": [
+                [],
+                []
+              ],
+              "expected": []
+            },
+            {
+              "id": "isolated-node",
+              "args": [
+                [
+                  "solo"
+                ],
+                []
+              ],
+              "expected": [
+                "solo"
+              ]
+            },
+            {
+              "id": "multi-parent",
+              "args": [
+                [
+                  "c",
+                  "b",
+                  "a",
+                  "d"
+                ],
+                [
+                  [
+                    "a",
+                    "d"
+                  ],
+                  [
+                    "b",
+                    "d"
+                  ],
+                  [
+                    "d",
+                    "c"
+                  ]
+                ]
+              ],
+              "expected": [
+                "a",
+                "b",
+                "d",
+                "c"
+              ]
+            },
+            {
+              "id": "self-cycle-with-isolated",
+              "args": [
+                [
+                  "one",
+                  "two"
+                ],
+                [
+                  [
+                    "two",
+                    "two"
+                  ]
+                ]
+              ],
+              "expected": []
+            }
+          ]
+        }
+      ],
+      "candidate_id": "fifo-newly-ready"
+    }
+  ],
+  "selection_rule": "Include both predefined candidates regardless of later model outcomes; no outcome-based filtering."
+}

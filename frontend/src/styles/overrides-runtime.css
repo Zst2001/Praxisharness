@@ -1,0 +1,60 @@
+.assistant-icon {
+  flex: 0 0 auto;
+}
+
+.message-edit-input {
+  font: inherit;
+}
+
+.message-edit-input,
+.message-edit-input textarea {
+  width: 100%;
+}
+
+.timezone-select,
+.fork-select {
+  width: min(320px, calc(100vw - 32px));
+  margin: 0 20px 8px;
+}
+
+.tool-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 6px 0;
+}
+
+.tool-line.failed {
+  display: block;
+  margin: 8px 0;
+}
+
+.tool-result {
+  margin: 8px 0;
+}
+
+.decision-card {
+  margin: 12px 0;
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.decision-card .decision-actions {
+  display: flex;
+  margin-top: 16px;
+}
+
+.question-block {
+  margin: 14px 0;
+}
+
+.question-options {
+  display: block;
+  margin: 10px 0;
+}
+
+.question-other-input {
+  max-width: 460px;
+}

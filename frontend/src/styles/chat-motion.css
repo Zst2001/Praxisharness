@@ -1,0 +1,165 @@
+@keyframes chat-sidebar-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(-4px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes chat-composer-reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.sidebar-reveal-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.sidebar-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 34px;
+  margin-bottom: 16px;
+  padding-inline: 8px;
+}
+
+.sidebar-project-title {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-collapse-button {
+  justify-self: end;
+  color: var(--muted);
+}
+
+.sidebar-collapse-button:hover,
+.sidebar-collapse-button:focus-visible {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.sidebar-primary-actions,
+.sidebar-project-history,
+.sidebar-ordinary-history,
+.sidebar-utility-section,
+.sidebar-footer {
+  flex-shrink: 0;
+}
+
+.sidebar-history-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-ordinary-history,
+.sidebar-project-history {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+
+.sidebar-section-toggle {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.sidebar-utility-section {
+  margin-top: auto;
+}
+
+.sidebar-footer {
+  margin-top: 4px;
+}
+
+.sidebar-reveal-active .sidebar-reveal-item {
+  --sidebar-reveal-delay: 0ms;
+  opacity: 0;
+  animation: chat-sidebar-reveal 160ms ease-out var(--sidebar-reveal-delay) both;
+  will-change: opacity, transform;
+}
+
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="0"] { --sidebar-reveal-index: 0; }
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="1"] { --sidebar-reveal-index: 1; }
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="2"] { --sidebar-reveal-index: 2; }
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="3"] { --sidebar-reveal-index: 3; }
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="4"] { --sidebar-reveal-index: 4; }
+.sidebar-reveal-active .sidebar-reveal-item[data-reveal-index="5"] { --sidebar-reveal-index: 5; }
+
+.composer-reveal-shell {
+  opacity: 0;
+  animation: chat-composer-reveal 160ms ease-out both;
+  will-change: opacity, transform;
+}
+
+.composer-reveal-shell .composer-reveal-item {
+  opacity: 1;
+}
+
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="0"] { --composer-reveal-index: 0; }
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="1"] { --composer-reveal-index: 1; }
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="2"] { --composer-reveal-index: 2; }
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="3"] { --composer-reveal-index: 3; }
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="4"] { --composer-reveal-index: 4; }
+.composer-reveal-shell .composer-reveal-item[data-reveal-index="5"] { --composer-reveal-index: 5; }
+
+/* A retained page is revealed, not entered again. */
+.retained-page--returned .composer-reveal-shell,
+.retained-page--returned .composer-reveal-item {
+  opacity: 1;
+  transform: none;
+  animation: none;
+  will-change: auto;
+}
+
+.app-shell--sidebar-collapsed .chat-page,
+.app-shell--sidebar-collapsed .chat-content,
+.app-shell--sidebar-collapsed .chat-scroll,
+.app-shell--sidebar-collapsed .composer {
+  width: 100%;
+  min-width: 0;
+}
+
+.app-shell--sidebar-collapsed .chat-messages,
+.app-shell--sidebar-collapsed .composer {
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-reveal-active .sidebar-reveal-item,
+  .composer-reveal-shell,
+  .composer-reveal-shell .composer-reveal-item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    will-change: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .sidebar-header {
+    margin-bottom: 12px;
+  }
+}

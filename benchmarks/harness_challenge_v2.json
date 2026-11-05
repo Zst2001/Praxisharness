@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "acceptance_revision": "v2",
+  "purpose": "Stronger public requirement coverage for merge-layers; independent cases unchanged from v1.",
+  "tasks": [
+    {
+      "id": "merge-layers",
+      "family": "code_repair",
+      "prompt": "Implement merge_layers(base, override): recursively merge JSON objects; replace arrays/scalars; a null override removes that key. Return a new object without mutating either input. Modify only solution.py; preserve public_checks.py. Run the public tests before finishing.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def merge_layers(base, override):\n    base.update(override)\n    return base\n"
+        },
+        {
+          "path": "public_checks.py",
+          "content": "import copy\nimport json\nfrom solution import merge_layers\n\ndef canonical(value):\n    return json.dumps(value, sort_keys=True, allow_nan=False)\n\ndef check(base, override, expected):\n    before = copy.deepcopy([base, override])\n    actual = merge_layers(base, override)\n    assert canonical(actual) == canonical(expected), 'merged result differs from requirements'\n    assert canonical([base, override]) == canonical(before), 'both inputs must remain deeply unchanged'\n\ncheck({'service': {'host': 'dev', 'port': 7000}, 'debug': True},\n      {'service': {'port': 8000}, 'debug': False},\n      {'service': {'host': 'dev', 'port': 8000}, 'debug': False})\ncheck({'limits': {'soft': 6, 'hard': 9}, 'x': 'keep'},\n      {'limits': {'soft': None, 'zero': 0}, 'gone': None},\n      {'limits': {'hard': 9, 'zero': 0}, 'x': 'keep'})\ncheck({'handler': 'legacy', 'seq': [1, 2]},\n      {'handler': {'enabled': False, 'deprecated': None}, 'seq': [3]},\n      {'handler': {'enabled': False}, 'seq': [3]})\ncheck({}, {'nested': {'removed': None}}, {'nested': {}})\ncheck({}, {}, {})\nprint('public checks passed')\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "from copy import deepcopy\n\ndef merge_layers(base, override):\n    result = deepcopy(base)\n    for key, value in override.items():\n        if value is None:\n            result.pop(key, None)\n        elif isinstance(value, dict):\n            previous = result.get(key)\n            result[key] = merge_layers(previous if isinstance(previous, dict) else {}, value)\n        else:\n            result[key] = deepcopy(value)\n    return result\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public",
+          "kind": "command",
+          "cmd": "\"{python}\" public_checks.py",
+          "timeout_seconds": 20
+        }
+      ],
+      "rubric": [
+        {
+          "id": "hidden",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "merge_layers",
+          "cases": [
+            {
+              "args": [
+                {
+                  "a": {
+                    "b": 1,
+                    "c": 2
+                  },
+                  "items": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "a": {
+                    "b": null,
+                    "d": 0
+                  },
+                  "items": []
+                }
+              ],
+              "expected": {
+                "a": {
+                  "c": 2,
+                  "d": 0
+                },
+                "items": []
+              }
+            },
+            {
+              "args": [
+                {
+                  "a": 7
+                },
+                {
+                  "a": {
+                    "x": false,
+                    "z": null
+                  },
+                  "missing": null
+                }
+              ],
+              "expected": {
+                "a": {
+                  "x": false
+                }
+              }
+            },
+            {
+              "args": [
+                {},
+                {}
+              ],
+              "expected": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

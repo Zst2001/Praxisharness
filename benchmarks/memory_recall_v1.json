@@ -1,0 +1,43 @@
+{
+  "items": [
+    ["topo", "alpha", "active", "拓扑排序每一步都要取当前最小节点", "Keep a minheap of ready vertices."],
+    ["queue", "alpha", "active", "并发队列取消后应释放许可", "Release the semaphore after cancellation."],
+    ["version", "alpha", "active", "发布版本应与清单一致", "Keep package_version consistent with the release manifest."],
+    ["ledger", "alpha", "active", "预算预留必须计入总额", "Include reservations in the spending ledger."],
+    ["encoding", "alpha", "active", "文本编码应统一为无签名格式", "Read the UTF8 fixture before conversion."],
+    ["rewind", "alpha", "active", "回退版本后重新检查来源", "Validate provenance after rewind."],
+    ["round", "alpha", "active", "复验轮次按条件编号对应", "Match check_id across attempts."],
+    ["archive", "alpha", "active", "归档清理时保留目录结构", "Preserve the archive directory tree."],
+    ["replica", "beta", "active", "副本延迟超限时检查慢查询", "Inspect replication lag."],
+    ["old", "alpha", "disabled", "旧缓存方案", "deprecated_cache"],
+    ["gone", "alpha", "deleted", "旧密封流程", "obsolete_seal"]
+  ],
+  "queries": {
+    "zh": [
+      ["alpha", "拓扑排序该怎么选节点", "topo"],
+      ["alpha", "如何释放许可", "queue"],
+      ["alpha", "清单里的发布版本", "version"],
+      ["alpha", "预算预留", "ledger"],
+      ["alpha", "如何统一文本编码", "encoding"],
+      ["alpha", "回退版本", "rewind"],
+      ["alpha", "如何确定复验轮次", "round"],
+      ["alpha", "归档清理", "archive"]
+    ],
+    "mixed": [
+      ["alpha", "minheap", "topo"],
+      ["alpha", "取消 semaphore", "queue"],
+      ["alpha", "package_version", "version"],
+      ["alpha", "spending ledger", "ledger"],
+      ["alpha", "读取 UTF8", "encoding"],
+      ["alpha", "rewind provenance", "rewind"],
+      ["alpha", "check_id 的含义", "round"],
+      ["alpha", "archive directory tree", "archive"]
+    ],
+    "negative": [
+      ["alpha", "海洋潮汐", null], ["alpha", "stellar luminosity", null],
+      ["alpha", "副本延迟", null], ["beta", "拓扑排序", null],
+      [null, "minheap", null], ["alpha", "deprecated_cache", null],
+      ["alpha", "obsolete_seal", null], ["beta", "package_version", null]
+    ]
+  }
+}

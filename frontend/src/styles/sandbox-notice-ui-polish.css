@@ -1,0 +1,41 @@
+.sandbox-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warning);
+  border-radius: 10px;
+  color: var(--text);
+  background: var(--surface);
+  text-align: left;
+}
+
+.sandbox-notice--pending { border-left-color: var(--info); }
+.sandbox-notice-icon { padding-top: 2px; color: var(--warning); font-size: 17px; }
+.sandbox-notice--pending .sandbox-notice-icon { color: var(--info); }
+.sandbox-notice-content { flex: 1; min-width: 0; }
+.sandbox-notice-summary strong { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.sandbox-notice-summary p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.sandbox-notice-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; padding-top: 1px; }
+.sandbox-notice-actions .ant-btn { min-height: 36px; font-size: 14px; }
+.sandbox-notice-actions .ant-btn:not(:disabled):hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-soft); }
+.sandbox-notice-details { margin-top: 10px; font-size: 13px; line-height: 1.65; }
+.sandbox-notice-details summary { width: fit-content; padding: 2px 0; color: var(--muted); cursor: pointer; }
+.sandbox-notice-details summary:hover { color: var(--accent); }
+.sandbox-notice-details summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 3px; }
+.sandbox-notice-details[open] summary { margin-bottom: 10px; }
+.sandbox-notice-details > div { padding: 10px; border-radius: 6px; background: var(--surface-subtle); }
+.sandbox-notice-check-error { margin: 6px 0; font-size: 14px; color: var(--error); }
+
+@media (max-width: 760px) {
+  .sandbox-notice { flex-wrap: wrap; gap: 8px; padding: 14px; }
+  .sandbox-notice-content { flex-basis: calc(100% - 32px); }
+  .sandbox-notice-actions { padding-left: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sandbox-notice .anticon-spin { animation: none; }
+}

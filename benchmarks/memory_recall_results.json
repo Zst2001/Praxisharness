@@ -1,0 +1,171 @@
+{
+  "zh": {
+    "passed": 8,
+    "rows": [
+      {
+        "query": "拓扑排序该怎么选节点",
+        "top3": [
+          "topo"
+        ],
+        "pass": true
+      },
+      {
+        "query": "如何释放许可",
+        "top3": [
+          "queue"
+        ],
+        "pass": true
+      },
+      {
+        "query": "清单里的发布版本",
+        "top3": [
+          "version",
+          "rewind"
+        ],
+        "pass": true
+      },
+      {
+        "query": "预算预留",
+        "top3": [
+          "ledger"
+        ],
+        "pass": true
+      },
+      {
+        "query": "如何统一文本编码",
+        "top3": [
+          "encoding"
+        ],
+        "pass": true
+      },
+      {
+        "query": "回退版本",
+        "top3": [
+          "rewind",
+          "version"
+        ],
+        "pass": true
+      },
+      {
+        "query": "如何确定复验轮次",
+        "top3": [
+          "round"
+        ],
+        "pass": true
+      },
+      {
+        "query": "归档清理",
+        "top3": [
+          "archive"
+        ],
+        "pass": true
+      }
+    ]
+  },
+  "mixed": {
+    "passed": 8,
+    "rows": [
+      {
+        "query": "minheap",
+        "top3": [
+          "topo"
+        ],
+        "pass": true
+      },
+      {
+        "query": "取消 semaphore",
+        "top3": [
+          "queue"
+        ],
+        "pass": true
+      },
+      {
+        "query": "package_version",
+        "top3": [
+          "version"
+        ],
+        "pass": true
+      },
+      {
+        "query": "spending ledger",
+        "top3": [
+          "ledger"
+        ],
+        "pass": true
+      },
+      {
+        "query": "读取 UTF8",
+        "top3": [
+          "encoding"
+        ],
+        "pass": true
+      },
+      {
+        "query": "rewind provenance",
+        "top3": [
+          "rewind"
+        ],
+        "pass": true
+      },
+      {
+        "query": "check_id 的含义",
+        "top3": [
+          "round"
+        ],
+        "pass": true
+      },
+      {
+        "query": "archive directory tree",
+        "top3": [
+          "archive"
+        ],
+        "pass": true
+      }
+    ]
+  },
+  "negative": {
+    "passed": 8,
+    "rows": [
+      {
+        "query": "海洋潮汐",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "stellar luminosity",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "副本延迟",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "拓扑排序",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "minheap",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "deprecated_cache",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "obsolete_seal",
+        "top3": [],
+        "pass": true
+      },
+      {
+        "query": "package_version",
+        "top3": [],
+        "pass": true
+      }
+    ]
+  }
+}

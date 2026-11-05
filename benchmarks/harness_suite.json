@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "normalize-config",
+      "prompt": "Update config.json to contain exactly {\"enabled\": true, \"retries\": 3}. Keep the values as JSON boolean and integer.",
+      "files": [{"path": "config.json", "content": "{\"enabled\": false, \"retries\": 0}"}],
+      "checks": [{"id": "config", "kind": "json_equals", "path": "config.json", "expected": {"enabled": true, "retries": 3}}],
+      "demo_output": {"path": "config.json", "content": "{\"enabled\": true, \"retries\": 3}"}
+    },
+    {
+      "id": "write-report",
+      "prompt": "Read input.json and write report.txt with the exact content total=10. The total is the sum of the numbers in input.json.",
+      "files": [{"path": "input.json", "content": "[2, 3, 5]"}],
+      "checks": [{"id": "report", "kind": "file_exists", "path": "report.txt"}, {"id": "total", "kind": "file_contains", "path": "report.txt", "text": "total=10"}],
+      "demo_output": {"path": "report.txt", "content": "total=10"}
+    },
+    {
+      "id": "deduplicate-values",
+      "prompt": "Read values.json. Write result.json as an object with a values array containing the unique input integers in ascending order.",
+      "files": [{"path": "values.json", "content": "[3, 1, 3, 2, 1]"}],
+      "checks": [{"id": "values", "kind": "json_equals", "path": "result.json", "expected": {"values": [1, 2, 3]}}],
+      "demo_output": {"path": "result.json", "content": "{\"values\": [1, 2, 3]}"}
+    }
+  ]
+}

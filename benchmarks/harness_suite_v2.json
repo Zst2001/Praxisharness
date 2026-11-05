@@ -1,0 +1,605 @@
+{
+  "schema_version": 2,
+  "description": "Local engineering tasks; not an official benchmark.",
+  "tasks": [
+    {
+      "id": "normalize-config",
+      "family": "configuration",
+      "prompt": "Update config.json to contain exactly {\"enabled\":true,\"retries\":3}. Keep valid JSON types.",
+      "files": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":false,\"retries\":0}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "config.json",
+          "content": "{\"enabled\":true,\"retries\":3}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "config",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ],
+      "rubric": [
+        {
+          "id": "configuration",
+          "kind": "json_equals",
+          "path": "config.json",
+          "expected": {
+            "enabled": true,
+            "retries": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "configure-retries",
+      "family": "configuration",
+      "prompt": "Read requirements.json. Create retry.json with exactly {\"attempts\":4,\"backoff_seconds\":[1,2,4]}. Preserve the requirements file.",
+      "files": [
+        {
+          "path": "requirements.json",
+          "content": "{\"attempts\":4,\"base_delay\":1,\"factor\":2}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "retry.json",
+          "content": "{\"attempts\":4,\"backoff_seconds\":[1,2,4]}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "retry",
+          "kind": "file_exists",
+          "path": "retry.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "retry_values",
+          "kind": "json_equals",
+          "path": "retry.json",
+          "expected": {
+            "attempts": 4,
+            "backoff_seconds": [
+              1,
+              2,
+              4
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "feature-flags",
+      "family": "configuration",
+      "prompt": "Read flags.json. Write enabled.json containing the alphabetically sorted names of flags with boolean true, as a JSON array. Preserve flags.json.",
+      "files": [
+        {
+          "path": "flags.json",
+          "content": "{\"search\":true,\"billing\":false,\"memory\":true,\"count\":1}"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "enabled.json",
+          "content": "[\"memory\",\"search\"]"
+        }
+      ],
+      "checks": [
+        {
+          "id": "flags",
+          "kind": "file_exists",
+          "path": "enabled.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "enabled_flags",
+          "kind": "json_equals",
+          "path": "enabled.json",
+          "expected": [
+            "memory",
+            "search"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "write-report",
+      "family": "data_processing",
+      "prompt": "Read input.json. Write report.json containing {\"count\":3,\"total\":10,\"mean\":3.3333333333333335}. Preserve input.json.",
+      "files": [
+        {
+          "path": "input.json",
+          "content": "[2,3,5]"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "report.json",
+          "content": "{\"count\":3,\"total\":10,\"mean\":3.3333333333333335}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "report",
+          "kind": "file_exists",
+          "path": "report.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "summary",
+          "kind": "json_equals",
+          "path": "report.json",
+          "expected": {
+            "count": 3,
+            "total": 10,
+            "mean": 3.3333333333333335
+          }
+        }
+      ]
+    },
+    {
+      "id": "deduplicate-values",
+      "family": "data_processing",
+      "prompt": "Read values.json. Write result.json as an object with a values array containing the unique integers sorted ascending. Preserve the input.",
+      "files": [
+        {
+          "path": "values.json",
+          "content": "[3,1,3,2,1,-2]"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "result.json",
+          "content": "{\"values\":[-2,1,2,3]}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "result",
+          "kind": "file_exists",
+          "path": "result.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "values",
+          "kind": "json_equals",
+          "path": "result.json",
+          "expected": {
+            "values": [
+              -2,
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "aggregate-orders",
+      "family": "data_processing",
+      "prompt": "Read orders.csv and create totals.json mapping each customer to the sum of amounts, excluding cancelled rows. Preserve orders.csv.",
+      "files": [
+        {
+          "path": "orders.csv",
+          "content": "customer,amount,status\nalice,12,paid\nbob,7,paid\nalice,3,paid\nbob,9,cancelled\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "totals.json",
+          "content": "{\"alice\":15,\"bob\":7}"
+        }
+      ],
+      "checks": [
+        {
+          "id": "totals",
+          "kind": "file_exists",
+          "path": "totals.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "order_totals",
+          "kind": "json_equals",
+          "path": "totals.json",
+          "expected": {
+            "alice": 15,
+            "bob": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": "repair-slugify",
+      "family": "code_repair",
+      "prompt": "Repair solution.slugify(text): lowercase ASCII text, trim whitespace, replace each run of non-alphanumeric characters with one hyphen, and strip edge hyphens. Read and run tests_public.py; preserve that test file.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def slugify(text):\n    return text.lower()\n"
+        },
+        {
+          "path": "tests_public.py",
+          "content": "from solution import slugify\nassert slugify(' Hello World! ') == 'hello-world'\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "import re\n\ndef slugify(text):\n    return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public_tests",
+          "kind": "command",
+          "cmd": "\"{python}\" tests_public.py",
+          "timeout_seconds": 15
+        }
+      ],
+      "rubric": [
+        {
+          "id": "behavior",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "slugify",
+          "cases": [
+            {
+              "args": [
+                " Hello World! "
+              ],
+              "expected": "hello-world"
+            },
+            {
+              "args": [
+                "A___B---C"
+              ],
+              "expected": "a-b-c"
+            },
+            {
+              "args": [
+                "!!!"
+              ],
+              "expected": ""
+            },
+            {
+              "args": [
+                "hello42"
+              ],
+              "expected": "hello42"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "repair-clamp",
+      "family": "code_repair",
+      "prompt": "Repair solution.clamp(value, lower, upper): return the value bounded by inclusive lower and upper. Inputs are integers and lower <= upper. Read and run tests_public.py; preserve that test file.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def clamp(value, lower, upper):\n    return min(value, upper)\n"
+        },
+        {
+          "path": "tests_public.py",
+          "content": "from solution import clamp\nassert clamp(-3, 0, 10) == 0\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "def clamp(value, lower, upper):\n    return max(lower, min(value, upper))\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public_tests",
+          "kind": "command",
+          "cmd": "\"{python}\" tests_public.py",
+          "timeout_seconds": 15
+        }
+      ],
+      "rubric": [
+        {
+          "id": "behavior",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "clamp",
+          "cases": [
+            {
+              "args": [
+                -3,
+                0,
+                10
+              ],
+              "expected": 0
+            },
+            {
+              "args": [
+                8,
+                0,
+                10
+              ],
+              "expected": 8
+            },
+            {
+              "args": [
+                12,
+                0,
+                10
+              ],
+              "expected": 10
+            },
+            {
+              "args": [
+                7,
+                5,
+                5
+              ],
+              "expected": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "repair-stable-unique",
+      "family": "code_repair",
+      "prompt": "Repair solution.stable_unique(values): return a new list of unique integers while preserving their first occurrence order. Do not change the input list. Read and run tests_public.py; preserve that test file.",
+      "files": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    return sorted(set(values))\n"
+        },
+        {
+          "path": "tests_public.py",
+          "content": "from solution import stable_unique\nassert stable_unique([3, 1, 3, 2]) == [3, 1, 2]\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "solution.py",
+          "content": "def stable_unique(values):\n    return list(dict.fromkeys(values))\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "public_tests",
+          "kind": "command",
+          "cmd": "\"{python}\" tests_public.py",
+          "timeout_seconds": 15
+        }
+      ],
+      "rubric": [
+        {
+          "id": "behavior",
+          "kind": "python_cases",
+          "path": "solution.py",
+          "function": "stable_unique",
+          "cases": [
+            {
+              "args": [
+                [
+                  3,
+                  1,
+                  3,
+                  2
+                ]
+              ],
+              "expected": [
+                3,
+                1,
+                2
+              ]
+            },
+            {
+              "args": [
+                []
+              ],
+              "expected": []
+            },
+            {
+              "args": [
+                [
+                  0,
+                  -1,
+                  0,
+                  5,
+                  -1
+                ]
+              ],
+              "expected": [
+                0,
+                -1,
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "release-version",
+      "family": "multi_file",
+      "prompt": "Set version 1.2.0 in package.json and VERSION. Preserve the name field praxis-demo and remove no other fields.",
+      "files": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"praxis-demo\",\"version\":\"1.1.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.1.0\n"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "package.json",
+          "content": "{\"name\":\"praxis-demo\",\"version\":\"1.2.0\"}"
+        },
+        {
+          "path": "VERSION",
+          "content": "1.2.0\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "package",
+          "kind": "file_exists",
+          "path": "package.json"
+        },
+        {
+          "id": "version",
+          "kind": "file_contains",
+          "path": "VERSION",
+          "text": "1.2.0"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "package_fields",
+          "kind": "json_equals",
+          "path": "package.json",
+          "expected": {
+            "name": "praxis-demo",
+            "version": "1.2.0"
+          }
+        },
+        {
+          "id": "version_file",
+          "kind": "file_equals",
+          "path": "VERSION",
+          "expected": "1.2.0\n"
+        }
+      ]
+    },
+    {
+      "id": "paired-summary",
+      "family": "multi_file",
+      "prompt": "Read inventory.json; write summary.json exactly {\"items\":3,\"units\":9} and summary.txt exactly \"items=3\\nunits=9\\n\". Preserve inventory.json.",
+      "files": [
+        {
+          "path": "inventory.json",
+          "content": "[{\"sku\":\"a\",\"units\":2},{\"sku\":\"b\",\"units\":3},{\"sku\":\"c\",\"units\":4}]"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "summary.json",
+          "content": "{\"items\":3,\"units\":9}"
+        },
+        {
+          "path": "summary.txt",
+          "content": "items=3\nunits=9\n"
+        }
+      ],
+      "checks": [
+        {
+          "id": "json",
+          "kind": "file_exists",
+          "path": "summary.json"
+        },
+        {
+          "id": "text",
+          "kind": "file_exists",
+          "path": "summary.txt"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "json_values",
+          "kind": "json_equals",
+          "path": "summary.json",
+          "expected": {
+            "items": 3,
+            "units": 9
+          }
+        },
+        {
+          "id": "text_values",
+          "kind": "file_equals",
+          "path": "summary.txt",
+          "expected": "items=3\nunits=9\n"
+        }
+      ]
+    },
+    {
+      "id": "split-records",
+      "family": "multi_file",
+      "prompt": "Read records.json. Split records into active.json and inactive.json arrays, preserving input order. Only boolean true counts as active. Preserve the source.",
+      "files": [
+        {
+          "path": "records.json",
+          "content": "[{\"id\":1,\"active\":true},{\"id\":2,\"active\":false},{\"id\":3,\"active\":true}]"
+        }
+      ],
+      "demo_outputs": [
+        {
+          "path": "active.json",
+          "content": "[{\"id\":1,\"active\":true},{\"id\":3,\"active\":true}]"
+        },
+        {
+          "path": "inactive.json",
+          "content": "[{\"id\":2,\"active\":false}]"
+        }
+      ],
+      "checks": [
+        {
+          "id": "active",
+          "kind": "file_exists",
+          "path": "active.json"
+        },
+        {
+          "id": "inactive",
+          "kind": "file_exists",
+          "path": "inactive.json"
+        }
+      ],
+      "rubric": [
+        {
+          "id": "active_records",
+          "kind": "json_equals",
+          "path": "active.json",
+          "expected": [
+            {
+              "id": 1,
+              "active": true
+            },
+            {
+              "id": 3,
+              "active": true
+            }
+          ]
+        },
+        {
+          "id": "inactive_records",
+          "kind": "json_equals",
+          "path": "inactive.json",
+          "expected": [
+            {
+              "id": 2,
+              "active": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
