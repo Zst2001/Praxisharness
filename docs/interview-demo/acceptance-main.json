@@ -1,0 +1,22 @@
+{
+  "checks": [
+    {
+      "id": "daily-summary",
+      "kind": "json_equals",
+      "path": "daily-summary.json",
+      "expected": {
+        "date": "2026-11-08",
+        "paid_orders": 4,
+        "unique_buyers": 3,
+        "total_amount_cents": 31000,
+        "ready": true
+      }
+    },
+    {"id": "report-title", "kind": "file_contains", "path": "report.md", "text": "订单日报"},
+    {"id": "report-amount", "kind": "file_contains", "path": "report.md", "text": "310.00 元"}
+  ],
+  "max_repairs": 2,
+  "max_model_turns": 32,
+  "max_tool_calls": 64,
+  "reserved_tool_calls": 0
+}

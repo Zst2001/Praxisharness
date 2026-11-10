@@ -1,0 +1,9 @@
+{
+  "checks": [
+    {"id": "boolean-ready", "kind": "json_equals", "path": "repair-probe.json", "expected": {"ready": true}}
+  ],
+  "max_repairs": 2,
+  "max_model_turns": 32,
+  "max_tool_calls": 32,
+  "reserved_tool_calls": 0
+}

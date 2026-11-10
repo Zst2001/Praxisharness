@@ -1,0 +1,9 @@
+[
+  {"order_id": "D001", "date": "2026-11-08", "buyer_id": "buyer-a", "status": "paid", "amount_cents": 12900},
+  {"order_id": "D002", "date": "2026-11-08", "buyer_id": "buyer-b", "status": "paid", "amount_cents": 5900},
+  {"order_id": "D003", "date": "2026-11-08", "buyer_id": "buyer-a", "status": "paid", "amount_cents": 10000},
+  {"order_id": "D004", "date": "2026-11-08", "buyer_id": "buyer-c", "status": "paid", "amount_cents": 2200},
+  {"order_id": "D005", "date": "2026-11-08", "buyer_id": "buyer-d", "status": "cancelled", "amount_cents": 8800},
+  {"order_id": "D006", "date": "2026-11-08", "buyer_id": "buyer-e", "status": "refunded", "amount_cents": 6000},
+  {"order_id": "D007", "date": "2026-11-07", "buyer_id": "buyer-f", "status": "paid", "amount_cents": 9900}
+]

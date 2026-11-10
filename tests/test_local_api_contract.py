@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from starlette.websockets import WebSocketDisconnect
 
 from backend.api.app import REPO_ROOT, create_app
 from backend.api.state import WebAppState
@@ -77,7 +78,14 @@ def test_readiness_only_checks_database_and_closed_queue_rejects_mutations(tmp_p
         assert create_turn.status_code == 503
 
 
-def test_browser_writes_require_an_allowed_loopback_origin_but_cli_writes_do_not(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "origin",
+    ["http://127.0.0.1:8000", "http://localhost:8000", "http://127.0.0.1:5173", "http://localhost:5173"],
+)
+def test_browser_writes_require_an_allowed_loopback_origin_but_cli_writes_do_not(
+    tmp_path: Path, monkeypatch, origin: str
+) -> None:
+    monkeypatch.delenv("PRAXIS_ALLOWED_ORIGINS", raising=False)
     state = WebAppState(tmp_path / ".praxis")
     with TestClient(create_app(state)) as client:
         assert (
@@ -90,14 +98,14 @@ def test_browser_writes_require_an_allowed_loopback_origin_but_cli_writes_do_not
         )
         with client.websocket_connect(
             "/api/window-control/ws?window_id=origin-test",
-            headers={"Origin": "http://127.0.0.1:5173"},
+            headers={"Origin": origin},
         ) as websocket:
             ready = websocket.receive_json()
             group = "resource:/api/sidebar-threads"
             websocket.send_json({"type": "group.open", "group": group, "request_id": "group"})
             opened = websocket.receive_json()
             headers = {
-                "Origin": "http://127.0.0.1:5173",
+                "Origin": origin,
                 "X-Praxis-Window": "origin-test",
                 "X-Praxis-Window-Generation": str(ready["generation"]),
                 "X-Praxis-Operation-Group": group,
@@ -110,17 +118,65 @@ def test_browser_writes_require_an_allowed_loopback_origin_but_cli_writes_do_not
             assert rejected.status_code == 403
             accepted = client.post("/api/sidebar-threads", json={}, headers=headers)
             assert accepted.status_code == 201
+
+            workspace = tmp_path / "demo-project"
+            workspace.mkdir()
+            selections = iter([None, workspace])
+            state.project_picker = lambda: next(selections)
+            websocket.send_json({"type": "group.open", "group": "projects:create", "request_id": "project"})
+            opened = websocket.receive_json()
+            headers.update(
+                {
+                    "X-Praxis-Operation-Group": "projects:create",
+                    "X-Praxis-Seq": str(opened["seq"]),
+                    "X-Praxis-Ack": str(opened["ack"]),
+                }
+            )
+            cancelled = client.post("/api/projects", headers=headers)
+            assert cancelled.status_code == 204
+            headers["X-Praxis-Seq"] = cancelled.headers["X-Praxis-Ack"]
+            headers["X-Praxis-Ack"] = str(int(cancelled.headers["X-Praxis-Seq"]) + 1)
+            created = client.post("/api/projects", headers=headers)
+            assert created.status_code == 200
+            assert created.json()["project"]["name"] == workspace.name
+            assert created.json()["session"]["project_id"] == created.json()["project"]["project_id"]
         assert client.post("/api/sidebar-threads", json={}).status_code == 201
 
         preflight = client.options(
             "/api/sidebar-threads",
             headers={
-                "Origin": "http://127.0.0.1:5173",
+                "Origin": origin,
                 "Access-Control-Request-Method": "POST",
             },
         )
         assert preflight.status_code == 200
         assert "access-control-allow-credentials" not in preflight.headers
+
+
+@pytest.mark.parametrize("origin", ["https://outside.example", "null", "http://127.0.0.1:9999"])
+def test_unlisted_origins_cannot_open_window_control(tmp_path: Path, monkeypatch, origin: str) -> None:
+    monkeypatch.delenv("PRAXIS_ALLOWED_ORIGINS", raising=False)
+    with TestClient(create_app(WebAppState(tmp_path / ".praxis"))) as client:
+        with pytest.raises(WebSocketDisconnect) as caught:
+            with client.websocket_connect("/api/window-control/ws?window_id=denied", headers={"Origin": origin}):
+                pytest.fail("Unlisted origin connected")
+        assert caught.value.code == 1008
+        assert client.post("/api/projects", headers={"Origin": origin}).status_code == 403
+
+
+def test_explicit_origins_override_production_defaults(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("PRAXIS_ALLOWED_ORIGINS", "http://localhost:9000")
+    with TestClient(create_app(WebAppState(tmp_path / ".praxis"))) as client:
+        with client.websocket_connect(
+            "/api/window-control/ws?window_id=configured", headers={"Origin": "http://localhost:9000"}
+        ) as websocket:
+            assert websocket.receive_json()["type"] == "ready"
+        with pytest.raises(WebSocketDisconnect):
+            with client.websocket_connect(
+                "/api/window-control/ws?window_id=denied", headers={"Origin": "http://127.0.0.1:8000"}
+            ):
+                pytest.fail("Explicit origin configuration was ignored")
+        assert client.post("/api/projects", headers={"Origin": "http://127.0.0.1:8000"}).status_code == 403
 
 
 def test_configured_browser_origins_must_remain_loopback(tmp_path: Path, monkeypatch) -> None:
